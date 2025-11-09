@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -8342708221358430005}
   m_Layer: 0
   m_Name: Turtle
-  m_TagString: Untagged
+  m_TagString: turtle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -153,5 +153,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurtleBehaviour
   seaTarget: {fileID: 0}
-  lightTarget: {fileID: 0}
   turtleSpeed: 3
