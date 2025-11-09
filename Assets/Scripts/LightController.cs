@@ -41,22 +41,32 @@ public class LightController : MonoBehaviour
     }
 
     void TurnLightOn()
+{
+    isCurrentlyOn = true;
+    myRenderer.material = lightOnMaterial;
+    
+    // --- LİSTE GÜNCELLEMESİ ---
+    // Eğer listede zaten yoksak, kendimizi listeye ekle.
+    if (!TurtleBehaviour.activeDistractionTargets.Contains(this.transform))
     {
-        isCurrentlyOn = true;
-        myRenderer.material = lightOnMaterial;
-        TurtleBehaviour.activeDistractionTarget = this.transform;
+        TurtleBehaviour.activeDistractionTargets.Add(this.transform);
     }
+    // -------------------------
+}
 
     void TurnLightOff()
-    {
-        isCurrentlyOn = false;
-        myRenderer.material = lightOffMaterial;
+{
+    isCurrentlyOn = false;
+    myRenderer.material = lightOffMaterial;
 
-        if (TurtleBehaviour.activeDistractionTarget == this.transform)
-        {
-            TurtleBehaviour.activeDistractionTarget = null;
-        }
+    // --- LİSTE GÜNCELLEMESİ ---
+    // Eğer listede varsak, kendimizi listeden çıkar.
+    if (TurtleBehaviour.activeDistractionTargets.Contains(this.transform))
+    {
+        TurtleBehaviour.activeDistractionTargets.Remove(this.transform);
     }
+    // -------------------------
+}
 
     IEnumerator RandomLightActivationRoutine()
     {
@@ -65,8 +75,7 @@ public class LightController : MonoBehaviour
             float waitTime = Random.Range(minRandomOnTime, maxRandomOnTime);
             yield return new WaitForSeconds(waitTime);
             
-            if (TurtleBehaviour.activeDistractionTarget == null && !isCurrentlyOn)
-            {
+            if (!isCurrentlyOn) {
                 TurnLightOn();
             }
         }
