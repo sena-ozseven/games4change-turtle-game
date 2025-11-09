@@ -27,6 +27,9 @@ public class GameManager : MonoBehaviour
 
     void SpawnTurtle()
     {
+
+        Debug.Log($"[DEBUG] turtlePrefab: {(turtlePrefab == null ? "null" : turtlePrefab.name)}");
+        Debug.Log($"[DEBUG] spawnPoints: {(spawnPoints == null ? "null" : spawnPoints.Length.ToString())}");
         if (turtlePrefab == null || spawnPoints.Length == 0)
         {
             Debug.LogError("Turtle Prefab veya Spawn Points atanmamış! Lütfen GameManager objesini kontrol et.");

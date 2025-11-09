@@ -50,7 +50,7 @@ public class CrabController : MonoBehaviour
         {
             Vector3 direction = (targetPosition - transform.position).normalized;
             rb.linearVelocity = direction * speed;
-            
+
             // Yengecin yüzünü gittiği yöne döndür (isteğe bağlı ama güzel bir detay)
             transform.rotation = Quaternion.LookRotation(direction);
         }
@@ -60,4 +60,18 @@ public class CrabController : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
         }
     }
+    
+    void OnCollisionEnter(Collision collision)
+{
+    // Çarptığımız objenin etiketi "Turtle" mı?
+    if (collision.gameObject.CompareTag("Turtle"))
+    {
+        // Evet, bir kaplumbağaya çarptık!
+        // Çarptığımız kaplumbağa objesini yok et.
+        Destroy(collision.gameObject);
+        
+        // İsteğe bağlı: Console'a bir mesaj yazdırarak test edebilirsin.
+        Debug.Log("Bir kaplumbağa yengeç tarafından yakalandı!");
+    }
+}
 }
