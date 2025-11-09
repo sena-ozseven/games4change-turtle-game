@@ -1,49 +1,75 @@
 using UnityEngine;
-using System.Collections.Generic; // List kullanmak için bu kütüphaneyi ekliyoruz!
-using System.Linq; // En yakın hedefi kolayca bulmak için (LINQ)
+using System.Collections.Generic;
+using System.Linq;
 
 public class TurtleBehaviour : MonoBehaviour
 {
-    // --- TEMEL DEĞİŞİKLİK: Tek bir Transform yerine, Transform'lardan oluşan bir LİSTE tutuyoruz ---
+    // Aktif dikkat dağıtıcı hedefler
     public static List<Transform> activeDistractionTargets = new List<Transform>();
-    // -----------------------------------------------------------------------------------------
 
-    public Transform seaTarget;
-    
+    [Header("Targets")]
+    public GameObject seaTarget; // Deniz hedefi (sahnede boş bir GameObject olabilir)
+
+    [Header("Movement Settings")]
     public float turtleSpeed = 3f;
-    
+
     private Rigidbody rb;
     private Transform currentTarget;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        if (rb == null)
+            Debug.LogError("Rigidbody component bulunamadı!");
+
         turtleSpeed = Random.Range(1.5f, 4.5f);
-        currentTarget = seaTarget;
+
+        // Sahnede "Sea" tag'ine sahip tek bir obje bul
+        seaTarget = GameObject.FindGameObjectWithTag("Sea");
+        if (seaTarget != null)
+            currentTarget = seaTarget.transform;
+        else
+            Debug.LogError("Sea target bulunamadı!");
     }
 
     void Update()
     {
-        // Aktif dikkat dağıtıcı hedefler listesi boş mu?
+        // Null objeleri listeden temizle
+        activeDistractionTargets = activeDistractionTargets.Where(t => t != null).ToList();
+
         if (activeDistractionTargets.Count > 0)
         {
-            // Liste boş değilse, en yakın hedefi bul ve onu ata.
-            currentTarget = GetClosestTarget(activeDistractionTargets);
+            Transform closest = GetClosestTarget(activeDistractionTargets);
+            currentTarget = closest != null ? closest : (seaTarget != null ? seaTarget.transform : null);
         }
         else
         {
-            // Liste boşsa, hedefimiz deniz olsun.
-            currentTarget = seaTarget;
+            if(seaTarget != null)
+                currentTarget = seaTarget.transform;
         }
     }
 
-    // Bu fonksiyon, verilen listedeki Transform'lardan bu kaplumbağaya en yakın olanı bulur.
+    // Verilen listeden en yakın Transform'u döndür
     Transform GetClosestTarget(List<Transform> targets)
     {
-        // LINQ kullanarak tek satırda en yakın hedefi buluyoruz.
-        // Her bir hedefi (t) alıp, o hedefin pozisyonu ile bizim pozisyonumuz arasındaki mesafeye göre sırala,
-        // ve bu sıralanmış listenin ilk elemanını (en yakını) geri döndür.
-        return targets.OrderBy(t => Vector3.Distance(transform.position, t.position)).FirstOrDefault();
+        if (targets == null || targets.Count == 0) return null;
+
+        Transform closest = null;
+        float minDistance = Mathf.Infinity;
+        Vector3 currentPos = transform.position;
+
+        foreach (Transform t in targets)
+        {
+            if (t == null) continue;
+            float dist = Vector3.Distance(currentPos, t.position);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closest = t;
+            }
+        }
+
+        return closest;
     }
 
     void FixedUpdate()
@@ -56,8 +82,6 @@ public class TurtleBehaviour : MonoBehaviour
         rb.MovePosition(transform.position + direction * turtleSpeed * Time.fixedDeltaTime);
 
         if (direction != Vector3.zero)
-        {
             transform.rotation = Quaternion.LookRotation(direction);
-        }
     }
 }
