@@ -7,7 +7,7 @@ public class TurtleBehaviour : MonoBehaviour
     public GameObject seaTarget;
     public GameObject lightTarget;
     
-    public float turtleSpeed = 3f;
+    public float turtleSpeed;
     public static bool isLightOn = false;
 
     private Rigidbody rb;
@@ -16,7 +16,7 @@ public class TurtleBehaviour : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        turtleSpeed = Random.Range(1.5f, 4.5f);
+        turtleSpeed = Random.Range(0.5f, 2f);
     }
 
     void Update()
