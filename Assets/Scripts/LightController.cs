@@ -1,51 +1,15 @@
-/* using UnityEngine;
-
-public class LightController : MonoBehaviour
-{
-    public Material lightOnMaterial;
-    public Material lightOffMaterial; 
-    
-    private Renderer myRenderer;
-    void Start()
-    {
-        myRenderer = GetComponent<Renderer>();
-        TurnLightOff();
-    }
-
-    void OnMouseDown()
-    {
-        if (TurtleBehaviour.isLightOn)
-        {
-            TurnLightOff();
-        }
-        else
-        {
-            TurnLightOn();
-        }
-    }
-
-
-     void TurnLightOn()
-    {
-        TurtleBehaviour.isLightOn = true;
-        myRenderer.material = lightOnMaterial;
-    }
-
-    void TurnLightOff()
-    {
-        TurtleBehaviour.isLightOn = false;
-        myRenderer.material = lightOffMaterial;
-    }
-}
-*/
-
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class LightController : MonoBehaviour
 {
     public Material lightOnMaterial;
     public Material lightOffMaterial;
+
+    [Header("Random Light Settings")]
+    public float minRandomOnTime = 5.0f;
+    public float maxRandomOnTime = 10.0f; 
 
     private Renderer myRenderer;
     private Camera mainCamera;
@@ -56,43 +20,32 @@ public class LightController : MonoBehaviour
         mainCamera = Camera.main;
         TurnLightOff();
 
-        // Başlangıçta kamera var mı diye kontrol edelim
         if (mainCamera == null)
         {
-            Debug.LogError("HATA: Sahnede 'MainCamera' etiketli bir kamera bulunamadı!");
+            Debug.LogError("error: could not find a camera labeled as 'MainCamera'!");
         }
+
+        StartCoroutine(RandomLightActivationRoutine());
     }
 
     void Update()
     {
-        // 1. ADIM: Mouse'a tıklandı mı?
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            Debug.Log("Mouse tıklandı!"); // Bu mesaj Console'da görünmeli
-
             Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
             RaycastHit hit;
 
-            // 2. ADIM: Işın bir şeye çarptı mı?
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == this.gameObject)
             {
-                // Neye çarptığını yazdır
-                Debug.Log("Işın bir objeye çarptı: " + hit.collider.gameObject.name);
-
-                // 3. ADIM: Çarptığı obje bu obje mi?
-                if (hit.collider.gameObject == this.gameObject)
+                if (TurtleBehaviour.isLightOn)
                 {
-                    Debug.Log("EVET! Doğru objeye ('Light') tıklandı. Işık durumu değiştiriliyor.");
-                    ToggleLight();
+                    TurnLightOff();
                 }
-            }
-            else
-            {
-                Debug.Log("Işın hiçbir şeye çarpmadı.");
             }
         }
     }
 
+    /* NOT IN USE ANYMORE
     void ToggleLight()
     {
         if (TurtleBehaviour.isLightOn)
@@ -103,7 +56,7 @@ public class LightController : MonoBehaviour
         {
             TurnLightOn();
         }
-    }
+    } */
 
     void TurnLightOn()
     {
@@ -115,5 +68,19 @@ public class LightController : MonoBehaviour
     {
         TurtleBehaviour.isLightOn = false;
         myRenderer.material = lightOffMaterial;
+    }
+
+    IEnumerator RandomLightActivationRoutine()
+    {
+        while (true)
+        {
+            float waitTime = Random.Range(minRandomOnTime, maxRandomOnTime);
+            yield return new WaitForSeconds(waitTime);
+            if (!TurtleBehaviour.isLightOn)
+            {
+                Debug.Log(waitTime + " saniye geçti, ışık otomatik olarak açılıyor!");
+                TurnLightOn();
+            }
+        }
     }
 }
