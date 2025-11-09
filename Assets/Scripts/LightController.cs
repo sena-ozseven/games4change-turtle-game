@@ -8,8 +8,8 @@ public class LightController : MonoBehaviour
     public Material lightOffMaterial;
 
     [Header("Random Light Settings")]
-    public float minRandomOnTime = 5.0f;
-    public float maxRandomOnTime = 10.0f; 
+    public float minRandomOnTime;
+    public float maxRandomOnTime; 
 
     private Renderer myRenderer;
     private Camera mainCamera;
