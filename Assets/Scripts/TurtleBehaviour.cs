@@ -1,9 +1,11 @@
+
+
 using UnityEngine;
 
 public class TurtleBehaviour : MonoBehaviour
 {
-    public Transform seaTarget;
-    public Transform lightTarget;
+    public GameObject seaTarget;
+    public GameObject lightTarget;
     
     public float turtleSpeed = 3f;
     public static bool isLightOn = false;
@@ -19,13 +21,13 @@ public class TurtleBehaviour : MonoBehaviour
 
     void Update()
     {
-        if (isLightOn)
+        if (isLightOn && lightTarget != null)
         {
-            currentTarget = lightTarget;
+            currentTarget = lightTarget.transform;
         }
-        else
+        else if (!isLightOn && seaTarget != null)
         {
-            currentTarget = seaTarget;
+            currentTarget = seaTarget.transform;
         }
     }
 
