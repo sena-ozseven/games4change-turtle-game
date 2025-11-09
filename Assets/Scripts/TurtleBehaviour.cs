@@ -1,33 +1,36 @@
-
-
 using UnityEngine;
 
 public class TurtleBehaviour : MonoBehaviour
 {
-    public GameObject seaTarget;
-    public GameObject lightTarget;
-    
-    public float turtleSpeed;
-    public static bool isLightOn = false;
+    public static Transform activeDistractionTarget;
 
+    public Transform seaTarget;
+    
+    public float turtleSpeed = 3f;
+    
     private Rigidbody rb;
     private Transform currentTarget;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        turtleSpeed = Random.Range(0.5f, 2f);
+        turtleSpeed = Random.Range(1.5f, 4.5f);
+
+        if (seaTarget != null)
+        {
+            currentTarget = seaTarget;
+        }
     }
 
     void Update()
     {
-        if (isLightOn && lightTarget != null)
+        if (activeDistractionTarget != null)
         {
-            currentTarget = lightTarget.transform;
+            currentTarget = activeDistractionTarget;
         }
-        else if (!isLightOn && seaTarget != null)
+        else
         {
-            currentTarget = seaTarget.transform;
+            currentTarget = seaTarget;
         }
     }
 

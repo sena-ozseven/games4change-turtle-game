@@ -8,23 +8,18 @@ public class LightController : MonoBehaviour
     public Material lightOffMaterial;
 
     [Header("Random Light Settings")]
-    public float minRandomOnTime;
-    public float maxRandomOnTime; 
+    public float minRandomOnTime = 5.0f;
+    public float maxRandomOnTime = 15.0f;
 
     private Renderer myRenderer;
     private Camera mainCamera;
+    private bool isCurrentlyOn = false;
 
     void Start()
     {
         myRenderer = GetComponent<Renderer>();
         mainCamera = Camera.main;
         TurnLightOff();
-
-        if (mainCamera == null)
-        {
-            Debug.LogError("error: could not find a camera labeled as 'MainCamera'!");
-        }
-
         StartCoroutine(RandomLightActivationRoutine());
     }
 
@@ -37,7 +32,7 @@ public class LightController : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == this.gameObject)
             {
-                if (TurtleBehaviour.isLightOn)
+                if (isCurrentlyOn)
                 {
                     TurnLightOff();
                 }
@@ -45,29 +40,22 @@ public class LightController : MonoBehaviour
         }
     }
 
-    /* NOT IN USE ANYMORE
-    void ToggleLight()
-    {
-        if (TurtleBehaviour.isLightOn)
-        {
-            TurnLightOff();
-        }
-        else
-        {
-            TurnLightOn();
-        }
-    } */
-
     void TurnLightOn()
     {
-        TurtleBehaviour.isLightOn = true;
+        isCurrentlyOn = true;
         myRenderer.material = lightOnMaterial;
+        TurtleBehaviour.activeDistractionTarget = this.transform;
     }
 
     void TurnLightOff()
     {
-        TurtleBehaviour.isLightOn = false;
+        isCurrentlyOn = false;
         myRenderer.material = lightOffMaterial;
+
+        if (TurtleBehaviour.activeDistractionTarget == this.transform)
+        {
+            TurtleBehaviour.activeDistractionTarget = null;
+        }
     }
 
     IEnumerator RandomLightActivationRoutine()
@@ -76,9 +64,9 @@ public class LightController : MonoBehaviour
         {
             float waitTime = Random.Range(minRandomOnTime, maxRandomOnTime);
             yield return new WaitForSeconds(waitTime);
-            if (!TurtleBehaviour.isLightOn)
+            
+            if (TurtleBehaviour.activeDistractionTarget == null && !isCurrentlyOn)
             {
-                Debug.Log(waitTime + " saniye geçti, ışık otomatik olarak açılıyor!");
                 TurnLightOn();
             }
         }
